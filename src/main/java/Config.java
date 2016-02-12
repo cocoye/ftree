@@ -4,8 +4,8 @@
 
 public class Config {
 
-    private static final String INPUT_PATH = "/home/hadoop/KDD dataset/";
-    private static final String OUTPUT_PATH = "/home/hadoop/output2/";
+    private static final String INPUT_PATH = "/home/yezi/data/KDD dataset/";
+    private static final String OUTPUT_PATH = "/home/yezi/output2/";
 
     private Config() {}
 

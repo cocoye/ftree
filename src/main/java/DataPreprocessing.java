@@ -8,14 +8,14 @@ import org.apache.flink.util.Collector;
  * Created by yezi on 1/31/16.
  */
 public class DataPreprocessing {
-    public static final String inputPathFull = "/home/hadoop/dataset/kddCUP/corrected";
-    public static final String inputPath = "/home/hadoop/dataset/kddCUP/kddcup.data_10_percent_corrected (2)";
-    public static final String outputPath = "/home/hadoop/KDD dataset/full7att";
-    public static final String testdataoutputPath = "/home/hadoop/KDD dataset/testdata";
-    public static final String outputPath10Proz = "/home/hadoop/KDD dataset/KDDnew10prozent";
-    public static final String outputPathSta = "/home/hadoop/KDD dataset/10prozent/";
-    public static final String outputPathStaFull = "/home/hadoop/KDD dataset/Full/";
-    public static final String outputPath10ProzDH = "/home/hadoop/KDD dataset/KDDnew10prozentdouhao";
+    public static final String inputPathFull = "/home/yezi/data/kddCUP/corrected";
+    public static final String inputPath = "/home/yezi/data/kddCUP/kddcup.data_10_percent_corrected (2)";
+    public static final String outputPath = "/home/yezi/data/KDD dataset/full7att";
+    public static final String testdataoutputPath = "/home/yezi/KDD dataset/testdata";
+    public static final String outputPath10Proz = "/home/yezi/data/KDD dataset/KDDnew10prozent";
+    public static final String outputPathSta = "/home/yezi/data/KDD dataset/10prozent/";
+    public static final String outputPathStaFull = "/home/yezi/KDD dataset/Full/";
+    public static final String outputPath10ProzDH = "/home/yezi/KDD dataset/KDDnew10prozentdouhao";
 
     public static void main(String[] args) throws Exception {
         ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
