@@ -4,8 +4,8 @@
 
 public class Config {
 
-    private static final String INPUT_PATH = "/home/yezi/data/KDD dataset/";
-    private static final String OUTPUT_PATH = "/home/yezi/output2/";
+    private static final String INPUT_PATH = "/home/hadoop/KDD dataset/";
+    private static final String OUTPUT_PATH = "/home/hadoop/output2/";
 
     private Config() {}
 
@@ -39,7 +39,7 @@ public class Config {
         return INPUT_PATH + "KDD7att";
     }
     public static String pathToRuleSet() {
-        return "/home/yezi/rule-6.txt";
+        return "/home/hadoop/rule-6.txt";
     }
     public static String pathToOutput() {return OUTPUT_PATH + "reduceOutput";}
 
@@ -51,4 +51,5 @@ public class Config {
     public static String pathToInputSet() {
         return INPUT_PATH + "car";
     }
+
 }

@@ -1,20 +1,20 @@
+
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class Split implements Cloneable{
-	public List att_index;
-	public List att_value;
+	public List featureIndex;
+	public List featureValue;
 	String classLabel;
 	public Split()
 	{
-		 this.att_index= new ArrayList<Integer>();
-		 this.att_value = new ArrayList<String>();
+		this.featureIndex = new ArrayList<>();
+		this.featureValue = new ArrayList<>();
 	}
-	public Split(List att_index, List att_value)
+	public Split(List featureIndex, List featureValue)
 	{
-		this.att_index=att_index;
-		this.att_value=att_value;
+		this.featureIndex = featureIndex;
+		this.featureValue =featureValue;
 	}
-
 }

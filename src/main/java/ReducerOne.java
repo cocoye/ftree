@@ -11,23 +11,22 @@ import java.util.StringTokenizer;
  * Created by hadoop on 31.01.16.
  */
 public class ReducerOne implements org.apache.flink.api.common.functions.GroupReduceFunction<Tuple2<String, Integer>, Tuple2<String, Integer>> {
+
+    int cont=0;
+
     @Override
     public void reduce(Iterable<Tuple2<String, Integer>> values, Collector<Tuple2<String, Integer>> out) throws Exception {
-        int cont = 1;
         Iterator<Tuple2<String, Integer>> iter = values.iterator();
-        Tuple2<String, Integer> key = iter.next();
+        Tuple2<String, Integer> tuple = iter.next();
+        int sum=tuple.f1;
 
-        String line = key.f0.replaceAll("[()]", "");
-        int sum=key.f1;
-        StringTokenizer itr = new StringTokenizer(line);
+        String line = tuple.f0.replaceAll("[()]", "");
         while (iter.hasNext()) {
             Tuple2<String, Integer> next = iter.next();
             line=next.f0.replaceAll("[()]", "");
-            cont++;
-            sum += key.f1;
+            cont ++;
+            sum += tuple.f1;
         }
         out.collect(new Tuple2<String, Integer>(line,sum));
     }
-
-
 }

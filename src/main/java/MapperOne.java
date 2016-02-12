@@ -1,67 +1,52 @@
-import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.util.Collector;
-
 import java.util.StringTokenizer;
 
-/**
- * Created by hadoop on 31.01.16.
- */
 public class MapperOne implements FlatMapFunction<String, Tuple2<String, Integer>> {
-    private int i;
-    private String token;
-    public static int no_Attr;
-    //public static int splitAttr[];
-    private int flag=0;
     @Override
-    public void flatMap(String value, Collector<Tuple2<String, Integer>> out) throws Exception {
-        TreeBuilder id=new TreeBuilder();
-        int size_split=0;
-        Split split=id.currentSplit;
-        StringTokenizer itr = new StringTokenizer(value);
-        int index=0;
-        String att_value=null;
-        no_Attr=itr.countTokens()-1;
-        String attr[]=new String[no_Attr];
-        boolean match=true;
-        for(i =0;i<no_Attr;i++)
-        {
-            attr[i]=itr.nextToken();		//Finding the values of different attributes
+    public void flatMap(String value, Collector<Tuple2<String, Integer>> out) throws Exception
+    {
+        Split split = TreeBuilder.currentSplit;
+        int sp_size=0;
+
+        //judge if index and value are match
+        boolean flag = true;
+
+        StringTokenizer strTokenizer = new StringTokenizer(value);
+
+        //amount of features, here is 7
+        int featureCount = strTokenizer.countTokens() - 1;
+
+        //store featueres of each line
+        String features[] = new String[featureCount];//0-7
+
+        for (int i = 0; i < featureCount; i++) {//0-6
+            features[i] = strTokenizer.nextToken();
         }
-        String classLabel=itr.nextToken();
-        size_split=split.att_index.size();
-        for(int count=0;count<size_split;count++)
-        {
-            index=(Integer) split.att_index.get(count);
-            att_value=(String)split.att_value.get(count);
-            if(attr[index].equals(att_value))   //may also use attr[index][z][1].contentEquals(att_value)
-            {}
-            else
+
+        String classLabel = strTokenizer.nextToken();
+
+        sp_size = split.featureIndex.size();//属性个数8
+        //iteration according to index of each line
+        for (int indexID = 0; indexID < sp_size; indexID++) {//0-7
+            int currentIndexID = (Integer) split.featureIndex.get(indexID);
+            String attValue = (String) split.featureValue.get(indexID);
+            if (!features[currentIndexID].equals(attValue))
             {
-                match=false;
+                flag = false;
                 break;
             }
-
         }
-        if(match)
-        {
-            for(int l=0;l<no_Attr;l++)
-            {
-                if(split.att_index.contains(l))
-                {
-
+        if (flag==true) {
+            for (int l = 0; l < featureCount; l++) {
+                if (!split.featureIndex.contains(l)) {
+                    //indexID,value,class,1
+                    out.collect(new Tuple2<String, Integer>(l + " " + features[l] + " " + classLabel, 1));
                 }
-                else
-                {
-                    token=l+" "+attr[l]+" "+classLabel;
-                    out.collect(new Tuple2<String, Integer>(token,1));
-                }
-
             }
-            if(size_split==no_Attr)
-            {
-                token=no_Attr+" "+"null"+" "+classLabel;
-                out.collect(new Tuple2<String, Integer>(token, 1));
+            if (sp_size == featureCount) {
+                out.collect(new Tuple2<String, Integer>(featureCount + " " + "null" + " " + classLabel, 1));
             }
         }
     }
