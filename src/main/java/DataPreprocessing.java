@@ -18,7 +18,6 @@ public class DataPreprocessing {
     public static final String outputPath10Proz = "/home/hadoop/KDD dataset/KDDnew10prozent";
     public static final String outputPathSta = "/home/hadoop/KDD dataset/10prozent/";
     public static final String outputPathStaFull = "/home/hadoop/KDD dataset/Full/";
-
     public static final String outputPath10ProzDH = "/home/hadoop/KDD dataset/KDDnew10prozentdouhao";
 
     public static void main(String[] args) throws Exception {
