@@ -8,8 +8,6 @@ import java.util.StringTokenizer;
  * Created by hadoop on 31.01.16.
  */
 public class MapperOne implements FlatMapFunction<String, Tuple2<String, Integer>> {
-    private String attValue = new String();
-    private String cLabel = new String();
     private int i;
     private String token;
     public static int no_Attr;
@@ -20,8 +18,7 @@ public class MapperOne implements FlatMapFunction<String, Tuple2<String, Integer
         TreeBuilder id=new TreeBuilder();
         int size_split=0;
         Split split=id.currentSplit;
-        String line = value.toString();      //changing input instance value to string
-        StringTokenizer itr = new StringTokenizer(line);
+        StringTokenizer itr = new StringTokenizer(value);
         int index=0;
         String att_value=null;
         no_Attr=itr.countTokens()-1;
