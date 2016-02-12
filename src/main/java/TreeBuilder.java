@@ -27,12 +27,12 @@ public class TreeBuilder {
         int attributeIndex = 0;
         splitList.add(currentSplit);
         int splitListSize = splitList.size();
-        GainRatio gainObj;
+        GainRatio C45;
         Split newSplit;
 
         while (splitListSize > currentIndex) {
             currentSplit = splitList.get(currentIndex);
-            gainObj = new GainRatio();
+            C45 = new GainRatio();
             env.readTextFile(Config.pathToPlayTennis())
                     .flatMap(new MapperOne())
                     .groupBy(0)
@@ -42,16 +42,16 @@ public class TreeBuilder {
                     .writeAsCsv(Config.pathToOutput() + currentIndex, "\n", " ", FileSystem.WriteMode.OVERWRITE)
                     .setParallelism(1);
             env.execute();
-            gainObj.getReduceResults();//将reduce输出的数组读到count[][]中
-            entropy = gainObj.currentNodeEntropy();
-            classLabel = gainObj.majorityLabel();
+            C45.getReduceResults();//将reduce输出的数组读到count[][]中
+            entropy = C45.currentNodeEntropy();
+            classLabel = C45.majorityLabel();
             currentSplit.classLabel = classLabel;
 
             if (entropy != 0.0 && currentSplit.featureIndex.size() != AttributeNumber) {
                 bestGainRatio = 0;
                 for (int i = 0; i < AttributeNumber; i++) {        //Finding the gain of each attribute
                     if (!currentSplit.featureIndex.contains(i)) { //表示这个属性在当前节点下属还木有被分裂过
-                        gainRatio = gainObj.gainRatioCalculator(i, entropy);
+                        gainRatio = C45.gainRatioCalculator(i, entropy);
                         if (gainRatio >= bestGainRatio) {
                             attributeIndex = i;
                             bestGainRatio = gainRatio;
@@ -59,7 +59,7 @@ public class TreeBuilder {
                     }
                 }
 
-                StringTokenizer attributes = new StringTokenizer(gainObj.getAttributeValues(attributeIndex));
+                StringTokenizer attributes = new StringTokenizer(C45.getAttributeValues(attributeIndex));
                 int splitNumber = attributes.countTokens(); //当前分裂节点属性值的个数
 
                 /*加上已有的分裂属性，再加上当前的分裂属性,构成一个新的分裂*/

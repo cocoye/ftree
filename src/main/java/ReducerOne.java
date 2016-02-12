@@ -27,6 +27,6 @@ public class ReducerOne implements org.apache.flink.api.common.functions.GroupRe
             cont ++;
             sum += tuple.f1;
         }
-        out.collect(new Tuple2<String, Integer>(line,sum));
+        out.collect(new Tuple2<>(line, sum));
     }
 }
