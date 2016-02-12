@@ -23,29 +23,29 @@ class GainRatio{
     public double currentNodeEntropy(){
         double entropy;
         int currentIndex=Integer.parseInt(reduceResults[0][0]);//当前属性的index
-        int covered[]=new int[LINE_NUMBER];
+        int labelMark[]=new int[LINE_NUMBER];
         int j=0;
         int tempIndex=-1;
-        int maxStrength=0;
+        int maxNumber=0;
 
         while(currentIndex==Integer.parseInt(reduceResults[j][0])){    // 当前索引值为reduce中输出的j行的索引值
-            if(covered[j]==0){
+            if(labelMark[j]==0){
                 String classLabel= reduceResults[j][2];
                 tempIndex++;
                 int i=j;
                 while(currentIndex==Integer.parseInt(reduceResults[i][0])) {
-                    if(covered[i]==0) {
+                    if(labelMark[i]==0) {
                         if(classLabel.contentEquals(reduceResults[i][2])) {
                         currentNode[tempIndex]= currentNode[tempIndex]+Integer.parseInt(reduceResults[i][3]);
-                        covered[i]=1;
+                        labelMark[i]=1;
                         }
                     }
                     i++;
                     if(i== lineNumber)
                         break;
                 }
-                if(currentNode[tempIndex]>maxStrength){
-                    maxStrength= currentNode[tempIndex];
+                if(currentNode[tempIndex]>maxNumber){
+                    maxNumber= currentNode[tempIndex];
                     majorityLabel=classLabel;
                 }
                 System.out.print( "currentNodeValue: "+ currentNode[tempIndex]+"\n"+"classLabel:" + classLabel+"\n");
