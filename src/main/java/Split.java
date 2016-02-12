@@ -16,9 +16,5 @@ public class Split implements Cloneable{
 		this.att_index=att_index;
 		this.att_value=att_value;
 	}
-	
-	public void add(Split obj)
-	{
-		this.add(obj);
-	}
+
 }

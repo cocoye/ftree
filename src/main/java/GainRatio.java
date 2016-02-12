@@ -36,7 +36,7 @@ class GainRatio{
                 while(currentIndex==Integer.parseInt(reduceResults[i][0])) {
                     if(labelMark[i]==0) {
                         if(classLabel.contentEquals(reduceResults[i][2])) {
-                        currentNode[tempIndex]= currentNode[tempIndex]+Integer.parseInt(reduceResults[i][3]);
+                        currentNode[tempIndex]+=Integer.parseInt(reduceResults[i][3]);
                         labelMark[i]=1;
                         }
                     }

@@ -1,10 +1,7 @@
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.apache.flink.api.java.tuple.Tuple1;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.tuple.Tuple7;
-import org.apache.flink.api.java.tuple.Tuple8;
+import org.apache.flink.api.java.tuple.*;
 import org.apache.flink.util.Collector;
 
 /**
@@ -24,7 +21,7 @@ public class DataPreprocessing {
     public static void main(String[] args) throws Exception {
         ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
 
-        /*变成6个属性，一个class*/
+/*        *//*变成6个属性，一个class*//*
         env.readCsvFile(Config.outpuPath7att()).fieldDelimiter(" ").includeFields("11111111")
                 .types(String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class)
                 .map(new MapFunction<Tuple8<String, String, String, String, String, String, String, String>, Tuple7<String, String, String, String, String, String, String>>() {
@@ -37,7 +34,7 @@ public class DataPreprocessing {
         env.execute();
 
 
-        /*format source dataset*/
+        *//*format source dataset*//*
         env.readCsvFile(Config.inputPathMetadata()).fieldDelimiter(",").includeFields("011110100001000000000010000000000000000001")
                 .types(String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class).flatMap(new FlatMapFunction<Tuple8<String, String, String, String, String, String, String, String>, Tuple8<String, String, String, String, String, String, String, String>>() {
             @Override
@@ -53,7 +50,7 @@ public class DataPreprocessing {
 
 
 
-        /*format attributes*/
+        *//*format attributes*//*
         env.readCsvFile(Config.inputPathMetadata()).fieldDelimiter(",").includeFields("011110100001000000000010000000000000000001")
                 .types(String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class).flatMap(new FlatMapFunction<Tuple8<String,String,String,String,String,String,String,String>, Tuple8<String,String,String,String,String,String,String,String>>() {
             @Override
@@ -105,25 +102,25 @@ public class DataPreprocessing {
 
 
 
-        /* 处理后的data format(逗号与空格分割转换)*/
+        *//* 处理后的data format(逗号与空格分割转换)*//*
         env.readCsvFile(outputPath).fieldDelimiter(",").includeFields("11111111")
                 .types(String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class)
                 .setParallelism(1).writeAsCsv(outputPath+"kongge", "\n", " ", org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE);
 
-        /*Dataset info statistics*/
+        *//*Dataset info statistics*//*
         env.readCsvFile(outputPath10ProzDH).fieldDelimiter(",").includeFields("10000000").types(String.class).map(new MapFunction<Tuple1<String>, Tuple2<String,Integer>>() {
             @Override
             public Tuple2<String, Integer> map(Tuple1<String> value) throws Exception {
                 return new Tuple2<String, Integer>(value.f0,1);
             }
         }).groupBy(0).sum(1).setParallelism(1).writeAsCsv(outputPathSta+"field1", "\n", " ", org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE);
-        env.execute();
+        env.execute();*/
 
-        env.readCsvFile(Config.pathToInputSet()).fieldDelimiter(",").includeFields("1111111")
+       /*env.readCsvFile(Config.pathToInputSet()).fieldDelimiter(",").includeFields("1111111")
                 .types(String.class, String.class, String.class,String.class,String.class,String.class, String.class)
-                .map(new MapFunction<Tuple7<String, String, String, String, String, String, String>, Tuple7<Long, Long, Long, Long, Long, Long, Long>>() {
+                    .map(new MapFunction<Tuple7<String, String, String, String, String, String, String>, Tuple7<Long, String, String, String, String, String, String>> () {
                     @Override
-                    public Tuple7<Long, Long, Long, Long, Long, Long, Long> map(Tuple7<String, String, String, String, String, String, String> tuple7) throws Exception {
+                    public Tuple7<Long, String, String, String, String, String, String> map(Tuple7<String, String, String, String, String, String, String> tuple7) throws Exception {
                         Long a0=0L, a1=0L, a2=0L, a3=0L, a4=0L, a5=0L, c=0L;
                         switch (tuple7.f0) {
                             case "vhigh":
@@ -220,11 +217,230 @@ public class DataPreprocessing {
 
 
 
-                        return new Tuple7<>(c,a0, a1, a2, a3, a4, a5);
+                        return new Tuple7<>(c,"1:"+a0, "2:"+a1,"3:"+ a2,"4:"+ a3,"5:"+ a4,"6:"+ a5);
                     }
-                }).setParallelism(1).writeAsCsv("/home/yezi/decisiontrees/sparktree/carforspark.csv", "\n", " ", org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE);
+                }).setParallelism(1).writeAsCsv("/home/yezi/decisiontrees/sparktree/carforspark", "\n", " ", org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE);
+
+        env.execute();*/
+       /* env.readCsvFile(Config.pathToPlayTennis()).fieldDelimiter(" ").includeFields("11111")
+                .types(String.class, String.class, String.class,String.class,String.class)
+                .map(new MapFunction<Tuple5<String, String, String, String, String>, Tuple5<Long, String, String, String, String> >() {
+                    @Override
+                    public Tuple5<Long, String, String, String, String> map(Tuple5<String, String, String, String, String> tuple5) throws Exception {
+                        int a0 = 0, a1 = 0, a2 = 0, a3 = 0;
+                        Long c = 0L;
+                        switch (tuple5.f0) {
+                            case "sunny":
+                                a0 = 0;
+                                break;
+                            case "overcast":
+                                a0 = 1;
+                                break;
+                            case "rain":
+                                a0 = 2;
+                                break;
+
+                        }
+                        switch (tuple5.f1) {
+                            case "hot":
+                                a1 = 0;
+                                break;
+                            case "mild":
+                                a1 = 1;
+                                break;
+                            case "cool":
+                                a1 = 2;
+                                break;
+
+                        }
+                        switch (tuple5.f2) {
+                            case "high":
+                                a2 = 2;
+                                break;
+                            case "normal":
+                                a2 = 3;
+                                break;
+
+                        }
+                        switch (tuple5.f3) {
+                            case "weak":
+                                a3 = 2;
+                                break;
+                            case "strong":
+                                a3 = 3;
+                                break;
+
+                        }
+                        switch (tuple5.f4) {
+                            case "yes":
+                                c = 0L;
+                                break;
+                            case "no":
+                                c = 1L;
+                                break;
+
+                        }
+
+
+                        return new Tuple5<>(c,"1:"+ a0,"2:"+ a1,"3:"+ a2,"4:"+a3);
+                    }
+                }).setParallelism(1).writeAsCsv("/home/yezi/decisiontrees/sparktree/playtennis", "\n", " ", org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE);
+
+        env.execute();*/
+        env.readCsvFile(Config.pathTo7attTrainingSet()).fieldDelimiter(" ").includeFields("11111111")
+                .types(String.class, String.class, String.class, String.class,String.class,String.class,String.class, String.class)
+                .map(new MapFunction<Tuple8<String,String, String, String, String, String, String, String>, Tuple8<Long, String, String, String, String, String, String, String>> () {
+                    @Override
+                    public Tuple8<Long, String,String, String, String, String, String, String> map(Tuple8<String,String, String, String, String, String, String, String> tuple8) throws Exception {
+                        Long a0=0L, a3=0L, a4=0L, a5=0L,a6=0L, c=0L;
+                        switch (tuple8.f0) {
+                            case "icmp":
+                                a0 = 0L;
+                                break;
+                            case "udp":
+                                a0 = 1L;
+                                break;
+                            case "tcp":
+                                a0 = 2L;
+                                break;
+                        }
+
+                        switch (tuple8.f3) {
+                            case "0":
+                                a3 = 2L;
+                                break;
+                            case "1032":
+                                a3 = 3L;
+                                break;
+                            case "105":
+                                a3 = 4L;
+                                break;
+                            case "520":
+                                a3 = 5L;
+                                break;
+                        }
+                        switch (tuple8.f4) {
+                            case "diff":
+                                a4 = 0L;
+                                break;
+                            case "same":
+                                a4 = 1L;
+                                break;
+
+                        }
+                        switch (tuple8.f5) {
+                            case "insuc":
+                                a5 = 0L;
+                                break;
+                            case "suc":
+                                a5 = 1L;
+                                break;
+                        }
+                        switch (tuple8.f6) {
+                            case "0":
+                                a6 = 0L;
+                                break;
+                            case "200":
+                                a6 = 1L;
+                                break;
+                            case "511":
+                                a6 = 2L;
+                                break;
+                        }
+                        switch (tuple8.f7) {
+                            case "normal":
+                                c = 0L;
+                                break;
+                            case "unnormal":
+                                c = 1L;
+                                break;
+
+                        }
+
+
+
+                        return new Tuple8<>(c,"1:"+a0, "2:"+tuple8.f1.hashCode(),"3:"+tuple8.f2.hashCode() ,"4:"+ a3,"5:"+ a4,"6:"+ a5,"7:"+a6);
+                    }
+                }).setParallelism(1).writeAsCsv("/home/yezi/decisiontrees/sparktree/KDD7att", "\n", " ", org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE);
 
         env.execute();
+    /*    env.readCsvFile(Config.outputPathTestdata()).fieldDelimiter(" ").includeFields("11111111")
+                .types(String.class, String.class, String.class, String.class,String.class,String.class,String.class, String.class)
+                .map(new MapFunction<Tuple8<String,String, String, String, String, String, String, String>, Tuple8<Long, String, String, String, String, String, String, String>> () {
+                    @Override
+                    public Tuple8<Long, String,String, String, String, String, String, String> map(Tuple8<String,String, String, String, String, String, String, String> tuple8) throws Exception {
+                        Long a0=0L, a3=0L, a4=0L, a5=0L,a6=0L, c=0L;
+                        switch (tuple8.f0) {
+                            case "icmp":
+                                a0 = 0L;
+                                break;
+                            case "udp":
+                                a0 = 1L;
+                                break;
+                            case "tcp":
+                                a0 = 2L;
+                                break;
+                        }
+
+                        switch (tuple8.f3) {
+                            case "0":
+                                a3 = 2L;
+                                break;
+                            case "1032":
+                                a3 = 3L;
+                                break;
+                            case "105":
+                                a3 = 4L;
+                                break;
+                            case "520":
+                                a3 = 5L;
+                                break;
+                        }
+                        switch (tuple8.f4) {
+                            case "diff":
+                                a4 = 0L;
+                                break;
+                            case "same":
+                                a4 = 1L;
+                                break;
+
+                        }
+                        switch (tuple8.f5) {
+                            case "insuc":
+                                a5 = 0L;
+                                break;
+                            case "suc":
+                                a5 = 1L;
+                                break;
+                        }
+                        switch (tuple8.f6) {
+                            case "0":
+                                a6 = 0L;
+                                break;
+                            case "200":
+                                a6 = 1L;
+                                break;
+                            case "511":
+                                a6 = 2L;
+                                break;
+                        }
+                        switch (tuple8.f7) {
+                            case "normal":
+                                c = 0L;
+                                break;
+                            case "unnormal":
+                                c = 1L;
+                                break;
+
+                        }
+
+
+
+                        return new Tuple8<>(c,"1:"+a0, "2:"+tuple8.f1.hashCode(),"3:"+tuple8.f2.hashCode() ,"4:"+ a3,"5:"+ a4,"6:"+ a5,"7:"+a6);
+                    }
+                }).setParallelism(1).writeAsCsv("/home/yezi/decisiontrees/sparktree/testData", "\n", " ", org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE);
+
+        env.execute();*/
     }
 
 
