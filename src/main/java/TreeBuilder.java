@@ -42,7 +42,7 @@ public class TreeBuilder {
                     .writeAsCsv(Config.pathToOutput() + currentIndex, "\n", " ", FileSystem.WriteMode.OVERWRITE)
                     .setParallelism(1);
             env.execute();
-            gainObj.getReduceResults();//将reduce输出的数组读到count[][]中
+            gainObj.getReduceResults();                    //将reduce输出的数组读到reduceResults[][]中
             entropy=gainObj.currentNodeEntropy();
             classLabel=gainObj.majorityLabel();
             currentSplit.classLabel=classLabel;
@@ -81,10 +81,10 @@ public class TreeBuilder {
                 }
                 rule=rule+" "+ currentSplit.classLabel;
                 writeRuleToFile(rule);
-                /*if(entropy!=0.0)
+                if(entropy!=0.0)
                     System.out.println("Enter rule in file:: "+rule);
                 else
-                    System.out.println("Enter rule in file Entropy zero ::   "+rule);*/
+                    System.out.println("Enter rule in file Entropy zero ::   "+rule);
             }
             splitListSize= splitList.size();
             System.out.println("there are "+splitListSize+ " nodes.");
