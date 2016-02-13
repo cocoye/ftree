@@ -42,7 +42,7 @@ public class TreeBuilder {
                     .writeAsCsv(Config.pathToOutput() + currentIndex, "\n", " ", FileSystem.WriteMode.OVERWRITE)
                     .setParallelism(1);
             env.execute();
-            C45.getReduceResults();//将reduce输出的数组读到count[][]中
+            C45.getReduceResults();//将reduce输出的数组读到reduceResult[][]中
             entropy = C45.currentNodeEntropy();
             classLabel = C45.majorityLabel();
             currentSplit.classLabel = classLabel;
