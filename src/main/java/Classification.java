@@ -21,7 +21,7 @@ public class Classification {
 
         ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
         DataSource<String> rules = env.readTextFile(Config.pathToRuleSet());
-        DataSource<String> testData = env.readTextFile(Config.pathToTestSet());
+        DataSource<String> testData = env.readTextFile(Config.pathToTestSet2());
 
         DataSet<Tuple3<String,String,String>> results=testData.flatMap(new Classifier()).withBroadcastSet(rules, "rules");
         DataSet<String> accuracy = results.reduceGroup(new Evaluator());

@@ -11,6 +11,7 @@ import java.util.StringTokenizer;
 class GainRatio{
 
     final static int LINE_NUMBER = 1000000;
+    final static int CLASS_NUMBER = 2;
     int lineNumber =0; //linenumber为reduce输出的line_number
     static String reduceResults[][]=new String[LINE_NUMBER][4];
     int currentNode[]=new int[100];                    //或者最多分100类

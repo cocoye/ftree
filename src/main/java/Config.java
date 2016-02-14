@@ -4,8 +4,8 @@
 
 public class Config {
 
-    private static final String INPUT_PATH = "/home/yezi/data/KDD dataset/";
-    private static final String OUTPUT_PATH = "/home/yezi/output2/";
+    private static final String INPUT_PATH = "/home/hadoop/KDD dataset/";
+    private static final String OUTPUT_PATH = "/home/hadoop/output2/";
 
     private Config() {}
 
@@ -32,14 +32,17 @@ public class Config {
         return INPUT_PATH+"playtennis.txt";
     }
     /*Path for building DTree*/
+    public static String pathToCar(){
+        return INPUT_PATH+"car.data";
+    }
     public static String pathTo6attTrainingSet() {
-        return INPUT_PATH + "KDD6att";
+        return INPUT_PATH + "kdddelete2";
     }
     public static String pathTo7attTrainingSet() {
         return INPUT_PATH + "KDD7att";
     }
     public static String pathToRuleSet() {
-        return "/home/hadoop/rule-6.txt";
+        return "/home/hadoop/rule-kddqu2.txt";
     }
     public static String pathToOutput() {return OUTPUT_PATH + "reduceOutput";}
 
@@ -51,5 +54,7 @@ public class Config {
     public static String pathToInputSet() {
         return INPUT_PATH + "car";
     }
-
+    public static String pathToTestSet2() {
+        return INPUT_PATH + "kddtestdelete2";
+    }
 }

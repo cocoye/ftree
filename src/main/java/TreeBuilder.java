@@ -19,6 +19,8 @@ public class TreeBuilder {
     public static void main(String[] args) throws Exception {
         ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
 
+        System.out.println(System.currentTimeMillis());
+        long time= System.currentTimeMillis();
         double entropy;
         double gainRatio;
         double bestGainRatio;
@@ -33,7 +35,7 @@ public class TreeBuilder {
         while (splitListSize > currentIndex) {
             currentSplit = splitList.get(currentIndex);
             C45 = new GainRatio();
-            env.readTextFile(Config.pathToPlayTennis())
+            env.readTextFile(Config.pathTo6attTrainingSet())
                     .flatMap(new MapperOne())
                     .groupBy(0)
                     .reduceGroup(new ReducerOne())
@@ -42,7 +44,7 @@ public class TreeBuilder {
                     .writeAsCsv(Config.pathToOutput() + currentIndex, "\n", " ", FileSystem.WriteMode.OVERWRITE)
                     .setParallelism(1);
             env.execute();
-            C45.getReduceResults();//将reduce输出的数组读到reduceResult[][]中
+            C45.getReduceResults();//将reduce输出的数组读到count[][]中
             entropy = C45.currentNodeEntropy();
             classLabel = C45.majorityLabel();
             currentSplit.classLabel = classLabel;
@@ -80,17 +82,13 @@ public class TreeBuilder {
                 }
                 rule = rule + " " + currentSplit.classLabel;
                 writeRuleToFile(rule);
-                /*if(entropy!=0.0)
-                    System.out.println("Enter rule in file:: "+rule);
-                else
-                    System.out.println("Enter rule in file Entropy zero ::   "+rule);*/
             }
             splitListSize = splitList.size();
             System.out.println("there are " + splitListSize + " nodes.");
 
             currentIndex++;
         }
-        System.out.println("Tree has been built!");
+        System.out.println("Tree has been built!"+"   "+time +"  "+System.currentTimeMillis());
     }
 
     public static void writeRuleToFile(String rule) {
