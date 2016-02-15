@@ -3,107 +3,93 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.*;
 import org.apache.flink.util.Collector;
-
-/**
- * Created by yezi on 1/31/16.
- */
 public class DataPreprocessing {
-    public static final String inputPathFull = "/home/yezi/data/kddCUP/corrected";
-    public static final String inputPath = "/home/yezi/data/kddCUP/kddcup.data_10_percent_corrected (2)";
-    public static final String outputPath = "/home/yezi/data/KDD dataset/full7att";
-    public static final String testdataoutputPath = "/home/hadoop/KDD dataset/car-data";
-
     public static void main(String[] args) throws Exception {
         ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
 
-/*
 
-        env.readCsvFile(Config.pathToCar()).fieldDelimiter(",").includeFields("1111111")
+      /*  env.readCsvFile(Config.pathTo7attTrainingSet()).fieldDelimiter(",").includeFields("1111111")
             .types(String.class, String.class, String.class,String.class, String.class, String.class, String.class).setParallelism(1)
-           .writeAsCsv(testdataoutputPath, "\n", " ", org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE);
+           .writeAsCsv(testdataoutputPath+"三属性", "\n", " ", org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE);
+        env.execute();*/
+
+        /*变成6个属性，一个class*/
+        env.readCsvFile(Config.pathTo7attTrainingSet()).fieldDelimiter(" ").includeFields("11111111")
+                .types(String.class, String.class, String.class, String.class, String.class,String.class, String.class, String.class)
+                .map(new MapFunction<Tuple8<String, String, String, String, String, String, String, String>, Tuple6<String, String, String,String, String, String>>() {
+                    @Override
+                    public Tuple6<String,String, String,String, String,String> map(Tuple8<String, String, String, String, String, String, String, String> value) throws Exception {
+                        return new Tuple6<String,String, String, String, String, String>(value.f0,value.f1,value.f3,value.f5,value.f6, value.f7);
+                    }
+                }).setParallelism(1).writeAsCsv("/home/hadoop/KDD dataset/5shuxing", "\n", " ", org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE);
+        env.execute();
+
+/*        *//*format source dataset*//**/
+/*        env.readCsvFile(Config.inputPathMetadata()).fieldDelimiter(",").includeFields("111110100001000000000010000000000000000001")
+                .types(String.class, String.class, String.class).flatMap(new FlatMapFunction<Tuple3<String, String, String>, Tuple3< String, String, String>>() {
+            @Override
+            public void flatMap(Tuple3< String, String, String> value, Collector<Tuple3< String, String, String>> out) throws Exception {
+                if (value.f2.compareTo("normal.") == 0) {
+                    out.collect(new Tuple3< String, String, String>(value.f0, value.f1,  "normal"));
+                } else {
+                    out.collect(new Tuple3<String, String, String>(value.f0, value.f1,"unnormal"));
+                }
+            }
+        }).setParallelism(1).writeAsCsv(Config.pathToResults()+"new2222", "\n", " ", org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE);
+        env.execute();*/
+        /*format attributes*/
+        /*env.readCsvFile(Config.inputPathTestdata()).fieldDelimiter(",").includeFields("111110100001000000000010000000000000000001")
+                .types(String.class, String.class, String.class, String.class,String.class, String.class, String.class, String.class, String.class).flatMap(new FlatMapFunction<Tuple9<String,String,String,String,String,String,String,String,String>, Tuple9<String,String,String,String,String,String,String,String,String>>() {
+            @Override
+            public void flatMap(Tuple9< String,String, String, String, String, String, String, String, String> value, Collector<Tuple9< String,String, String, String, String, String, String, String, String>> out) throws Exception {
+                if(value.f8.compareTo("normal.")==0){
+                    out.collect(new Tuple9<String, String, String, String, String, String, String, String, String>(value.f0, value.f1, value.f2, value.f3, value.f4, value.f5, value.f6, value.f7,"normal"));
+                }
+                else {
+                    out.collect(new Tuple9<String, String, String, String, String, String, String, String, String>(value.f0, value.f1, value.f2, value.f3, value.f4, value.f5, value.f6,value.f7, "unnormal"));
+                }
+            }}).map(new MapFunction<Tuple9< String,String, String, String, String, String, String, String, String>, Tuple9< String,String, String, String, String, String, String, String, String>>() {
+            @Override
+            public Tuple9< String,String, String, String, String, String, String, String, String> map(Tuple9< String,String, String, String, String, String, String, String, String> value) throws Exception {
+                if(value.f6.compareTo("0")==0) {
+                    return new Tuple9<String, String, String, String, String, String, String, String, String>(value.f0, value.f1, value.f2, value.f3, value.f4, value.f5,"suc",  value.f7, value.f8);
+                }
+                return new Tuple9<String, String, String, String, String, String, String, String, String>(value.f0, value.f1, value.f2, value.f3, value.f4, value.f5,"insuc",  value.f7, value.f8);
+            }
+        }).flatMap(new FlatMapFunction<Tuple9<String,String,String,String,String,String,String,String,String>, Tuple9<String,String,String,String,String,String,String,String,String>>() {
+            @Override
+            public void flatMap(Tuple9<String,String,String,String,String,String,String,String,String> value, Collector<Tuple9<String,String,String,String,String,String,String,String,String>> out) throws Exception {
+                if(Integer.parseInt(value.f7)>=100&&Integer.parseInt(value.f7)<=300){
+                    out.collect(new Tuple9<String, String, String, String, String, String, String, String, String>(value.f0, value.f1, value.f2, value.f3, value.f4, value.f5,value.f6, "200", value.f8));
+                }
+                if (Integer.parseInt(value.f7)>=300){
+                    out.collect(new Tuple9<String, String, String, String, String, String, String, String, String>(value.f0, value.f1, value.f2, value.f3, value.f4, value.f5,value.f6, "511", value.f8));
+                }
+                if(Integer.parseInt(value.f7)<=100){out.collect(new Tuple9<String, String, String, String, String, String, String, String, String>(value.f0, value.f1, value.f2, value.f3, value.f4, value.f5,value.f6, "0", value.f8));}
+            }}).flatMap(new FlatMapFunction<Tuple9<String,String,String,String,String,String,String,String,String>, Tuple9<String,String,String,String,String,String,String,String,String>>() {
+            @Override
+            public void flatMap(Tuple9<String,String,String,String,String,String,String,String,String> value, Collector<Tuple9<String,String,String,String,String,String,String,String,String>> out) throws Exception {
+                if(Integer.parseInt(value.f4)==0){
+                    out.collect(new Tuple9<String, String, String, String, String, String, String, String, String>(value.f0, value.f1, value.f2,value.f3, "0", value.f5, value.f6, value.f7,value.f8));
+                }
+                if (Integer.parseInt(value.f4)<=200&&Integer.parseInt(value.f4)>0){
+                    out.collect(new Tuple9<String, String, String, String, String, String, String, String, String>(value.f0, value.f1, value.f2,value.f3, "105", value.f5, value.f6, value.f7,value.f8));
+                }
+                if(Integer.parseInt(value.f4)<=600&&Integer.parseInt(value.f4)>200){out.collect(new Tuple9<String, String, String, String, String, String, String, String, String>(value.f0, value.f1, value.f2,value.f3, "520", value.f5, value.f6, value.f7,value.f8));}
+                else{out.collect(new Tuple9<String, String, String, String, String, String, String, String, String>(value.f0, value.f1, value.f2,value.f3, "1032", value.f5, value.f6, value.f7,value.f8));}
+            }}).flatMap(new FlatMapFunction<Tuple9<String,String,String,String,String,String,String,String,String>, Tuple9<String,String,String,String,String,String,String,String,String>>() {
+            @Override
+            public void flatMap(Tuple9<String,String,String,String,String,String,String,String,String> value, Collector<Tuple9<String,String,String,String,String,String,String,String,String>> out) throws Exception {
+                if(Integer.parseInt(value.f5)==0){
+                    out.collect(new Tuple9<String, String, String, String, String, String, String, String, String>(value.f0, value.f1, value.f2, value.f3, value.f4,"same",value.f6, value.f7,value.f8));
+                }
+                else { out.collect(new Tuple9<String, String, String, String, String, String, String, String, String>(value.f0, value.f1, value.f2, value.f3, value.f4, "diff", value.f6, value.f7,value.f8));}
+            }}).setParallelism(1).writeAsCsv(Config.outpuPath7att()+"8atttest", "\n", " ", org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE);
         env.execute();
 */
 
-/*        *//*变成6个属性，一个class*/
-        env.readCsvFile(Config.pathToTestSet()).fieldDelimiter(" ").includeFields("11111111")
-                .types(String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class)
-                .map(new MapFunction<Tuple8<String, String, String, String, String, String, String, String>, Tuple7<String, String, String, String, String, String, String>>() {
-                    @Override
-                    public Tuple7<String, String, String, String, String, String, String> map(Tuple8<String, String, String, String, String, String, String, String> value) throws Exception {
-                        return new Tuple7<>(value.f0, value.f1, value.f2, value.f3, value.f4,value.f5, value.f7);
-                    }
-                })
-                .setParallelism(1).writeAsCsv("/home/hadoop/KDD dataset/kddtestdelete6", "\n", " ", org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE);
-        env.execute();
 
-        /*format source dataset*//*
-        env.readCsvFile(Config.inputPathMetadata()).fieldDelimiter(",").includeFields("011110100001000000000010000000000000000001")
-                .types(String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class).flatMap(new FlatMapFunction<Tuple8<String, String, String, String, String, String, String, String>, Tuple8<String, String, String, String, String, String, String, String>>() {
-            @Override
-            public void flatMap(Tuple8<String, String, String, String, String, String, String, String> value, Collector<Tuple8<String, String, String, String, String, String, String, String>> out) throws Exception {
-                if (value.f7.compareTo("normal.") == 0) {
-                    out.collect(new Tuple8<>(value.f0, value.f1, value.f2, value.f3, value.f4, value.f5, value.f6, "normal"));
-                } else {
-                    out.collect(new Tuple8<>(value.f0, value.f1, value.f2, value.f3, value.f4, value.f5, value.f6, "unnormal"));
-                }
-            }
-        }).setParallelism(1).writeAsCsv(testdataoutputPath, "\n", " ", org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE);
-        env.execute();
-
-
-        *//*format attributes*//*
-        env.readCsvFile(Config.inputPathMetadata()).fieldDelimiter(",").includeFields("011110100001000000000010000000000000000001")
-                .types(String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class).flatMap(new FlatMapFunction<Tuple8<String,String,String,String,String,String,String,String>, Tuple8<String,String,String,String,String,String,String,String>>() {
-            @Override
-            public void flatMap(Tuple8< String, String, String, String, String, String, String, String> value, Collector<Tuple8< String, String, String, String, String, String, String, String>> out) throws Exception {
-                if(value.f7.compareTo("normal.")==0){
-                    out.collect(new Tuple8<>(value.f0, value.f1, value.f2, value.f3, value.f4, value.f5, value.f6, "normal"));
-                }
-                else {
-                    out.collect(new Tuple8<>(value.f0, value.f1, value.f2, value.f3, value.f4, value.f5, value.f6, "unnormal"));
-                }
-            }}).map(new MapFunction<Tuple8<String,String,String,String,String,String,String,String>, Tuple8<String,String,String,String,String,String,String,String>>() {
-            @Override
-            public Tuple8<String, String, String, String, String, String, String, String> map(Tuple8<String, String, String, String, String, String, String, String> value) throws Exception {
-                if(value.f5.compareTo("0")==0) {
-                    return new Tuple8<>(value.f0, value.f1, value.f2, value.f3, value.f4, "suc", value.f6, value.f7);
-                }
-                return new Tuple8<>(value.f0, value.f1, value.f2, value.f3, value.f4, "insuc", value.f6, value.f7);
-            }
-        }).flatMap(new FlatMapFunction<Tuple8<String,String,String,String,String,String,String,String>, Tuple8<String,String,String,String,String,String,String,String>>() {
-            @Override
-            public void flatMap(Tuple8< String, String, String, String, String, String, String, String> value, Collector<Tuple8< String, String, String, String, String, String, String, String>> out) throws Exception {
-                if(Integer.parseInt(value.f6)>=100&&Integer.parseInt(value.f6)<=300){
-                    out.collect(new Tuple8<>(value.f0, value.f1, value.f2, value.f3, value.f4, value.f5, "200", value.f7));
-                }
-                if (Integer.parseInt(value.f6)>=300){
-                    out.collect(new Tuple8<>(value.f0, value.f1, value.f2, value.f3, value.f4, value.f5, "511", value.f7));
-                }
-                if(Integer.parseInt(value.f6)<=100){out.collect(new Tuple8<>(value.f0, value.f1, value.f2, value.f3, value.f4, value.f5, "0", value.f7));}
-            }}).flatMap(new FlatMapFunction<Tuple8<String,String,String,String,String,String,String,String>, Tuple8<String,String,String,String,String,String,String,String>>() {
-            @Override
-            public void flatMap(Tuple8< String, String, String, String, String, String, String, String> value, Collector<Tuple8< String, String, String, String, String, String, String, String>> out) throws Exception {
-                if(Integer.parseInt(value.f3)==0){
-                    out.collect(new Tuple8<>(value.f0, value.f1, value.f2, "0", value.f4, value.f5, value.f6, value.f7));
-                }
-                if (Integer.parseInt(value.f3)<=200&&Integer.parseInt(value.f3)>0){
-                    out.collect(new Tuple8<>(value.f0, value.f1, value.f2, "105", value.f4, value.f5, value.f6, value.f7));
-                }
-                if(Integer.parseInt(value.f3)<=600&&Integer.parseInt(value.f3)>200){out.collect(new Tuple8<>(value.f0, value.f1, value.f2, "520", value.f4, value.f5, value.f6, value.f7));}
-                else{out.collect(new Tuple8<>(value.f0, value.f1, value.f2, "1032", value.f4, value.f5, value.f6, value.f7));}
-            }}).flatMap(new FlatMapFunction<Tuple8<String,String,String,String,String,String,String,String>, Tuple8<String,String,String,String,String,String,String,String>>() {
-            @Override
-            public void flatMap(Tuple8< String, String, String, String, String, String, String, String> value, Collector<Tuple8< String, String, String, String, String, String, String, String>> out) throws Exception {
-                if(Integer.parseInt(value.f4)==0){
-                    out.collect(new Tuple8<>(value.f0, value.f1, value.f2, value.f3, "same", value.f5, value.f6, value.f7));
-                }
-                else { out.collect(new Tuple8<>(value.f0, value.f1, value.f2, value.f3, "diff", value.f5, value.f6, value.f7));}
-            }}).setParallelism(1).writeAsCsv(testdataoutputPath, "\n", " ", org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE);
-        env.execute();
-
-
-
-        *//* 处理后的data format(逗号与空格分割转换)*//*
+        /* 处理后的data format(逗号与空格分割转换)*//*
         env.readCsvFile(outputPath).fieldDelimiter(",").includeFields("11111111")
                 .types(String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class)
                 .setParallelism(1).writeAsCsv(outputPath+"kongge", "\n", " ", org.apache.flink.core.fs.FileSystem.WriteMode.OVERWRITE);

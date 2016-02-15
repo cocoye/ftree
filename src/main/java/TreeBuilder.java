@@ -25,7 +25,7 @@ public class TreeBuilder {
         double gainRatio;
         double bestGainRatio;
         String classLabel;
-        int AttributeNumber = 4;
+        int AttributeNumber =6;
         int attributeIndex = 0;
         splitList.add(currentSplit);
         int splitListSize = splitList.size();
@@ -35,7 +35,7 @@ public class TreeBuilder {
         while (splitListSize > currentIndex) {
             currentSplit = splitList.get(currentIndex);
             C45 = new GainRatio();
-            env.readTextFile(Config.pathTo6attTrainingSet())
+            env.readTextFile(Config.pathTo7attTrainingSet())
                     .flatMap(new MapperOne())
                     .groupBy(0)
                     .reduceGroup(new ReducerOne())
@@ -100,5 +100,4 @@ public class TreeBuilder {
         } catch (Exception e) {
         }
     }
-
 }

@@ -1,7 +1,3 @@
-/**
- * Created by yezi on 2/1/16.
- */
-
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
@@ -10,7 +6,7 @@ import java.util.StringTokenizer;
 
 class GainRatio{
 
-    final static int LINE_NUMBER = 1000000;
+    final static int LINE_NUMBER = 1500000;
     final static int CLASS_NUMBER = 2;
     int lineNumber =0; //linenumber为reduce输出的line_number
     static String reduceResults[][]=new String[LINE_NUMBER][4];

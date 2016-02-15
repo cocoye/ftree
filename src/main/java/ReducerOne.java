@@ -7,9 +7,6 @@ import java.io.FileWriter;
 import java.util.Iterator;
 import java.util.StringTokenizer;
 
-/**
- * Created by hadoop on 31.01.16.
- */
 public class ReducerOne implements org.apache.flink.api.common.functions.GroupReduceFunction<Tuple2<String, Integer>, Tuple2<String, Integer>> {
 
     int cont=0;
