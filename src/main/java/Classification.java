@@ -12,20 +12,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+/**
+ * Created by yezi on 2/4/16.
+ */
 public class Classification {
 
     public static void main(String args[]) throws Exception {
 
         ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
-        long time= System.currentTimeMillis();
         DataSource<String> rules = env.readTextFile(Config.pathToRuleSet());
-        DataSource<String> testData = env.readTextFile(Config.pathToTestSet2());
+        DataSource<String> testData = env.readTextFile(Config.pathToGeTestSet());
 
         DataSet<Tuple3<String,String,String>> results=testData.flatMap(new Classifier()).withBroadcastSet(rules, "rules");
         DataSet<String> accuracy = results.reduceGroup(new Evaluator());
         results.writeAsCsv(Config.pathToResults(), FileSystem.WriteMode.OVERWRITE);
         accuracy.print();
-        System.out.print(time +"  "+System.currentTimeMillis());
     }
 
     public static class Classifier extends RichFlatMapFunction<String, Tuple3<String,String, String>> {
@@ -66,7 +67,11 @@ public class Classification {
                     }
                     if (k != no_Rule - 2) {
                         continue;
-                    }predictClassLabel = ruleClassLabel;
+                    }
+/*                    if(k == no_Rule -2 & testData[Integer.parseInt(rule[k])].equals(rule[no_Rule-1])) {
+                        predictClassLabel = ruleClassLabel;
+                    }*/
+                    predictClassLabel = ruleClassLabel;
                 }
             }
             collector.collect(new Tuple3<String,String,String>(predictClassLabel,testData[no_Attr - 1],s));

@@ -1,3 +1,7 @@
+/**
+ * Created by yezi on 2/1/16.
+ */
+
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
@@ -6,8 +10,7 @@ import java.util.StringTokenizer;
 
 class GainRatio{
 
-    final static int LINE_NUMBER = 1500000;
-    final static int CLASS_NUMBER = 2;
+    final static int LINE_NUMBER = 1000000;
     int lineNumber =0; //linenumber为reduce输出的line_number
     static String reduceResults[][]=new String[LINE_NUMBER][4];
     int currentNode[]=new int[100];                    //或者最多分100类
@@ -80,7 +83,7 @@ class GainRatio{
     public void getReduceResults(){
        // TreeBuilder id=new TreeBuilder();
         try {
-            FileInputStream fileInputStream = new FileInputStream(Config.pathToOutput() + TreeBuilder.currentIndex);
+            FileInputStream fileInputStream = new FileInputStream("/home/yezi/data/output/" + TreeBuilder.currentIndex);
             DataInputStream in = new DataInputStream(fileInputStream);
             BufferedReader br = new BufferedReader(new InputStreamReader(in));
             String line;
@@ -110,8 +113,8 @@ class GainRatio{
     public double gainRatioCalculator(int index, double entropy)
     {
         //100 is considered as max ClassLabels
-        int s[][]=new int[LINE_NUMBER][100];
-        int sum[]=new int[LINE_NUMBER]; //
+        int s[][]=new int[1000][100];
+        int sum[]=new int[1000]; //
         String currentAttributeValue="";
         double gainRatio;
         int j=0;
