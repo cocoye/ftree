@@ -51,7 +51,7 @@ public class TreeBuilder {
 
 
 
-            //env.execute();
+            env.execute();
             C45.getReduceResults();//read reduce output information to reduceResult[][]
             entropy = C45.currentNodeEntropy();
             classLabel = C45.majorityLabel();
