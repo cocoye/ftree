@@ -1,12 +1,17 @@
-import org.apache.avro.generic.GenericData;
-import org.apache.flink.api.common.functions.*;
+/** the algorithm idea implemented totally in Flink Dataflow way but unfortunately has something wrong with it.
+*/
+
+import org.apache.flink.api.common.functions.CrossFunction;
+import org.apache.flink.api.common.functions.GroupReduceFunction;
+import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.api.common.operators.Order;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.apache.flink.api.java.operators.DataSource;
 import org.apache.flink.api.java.operators.IterativeDataSet;
-import org.apache.flink.api.java.tuple.*;
+import org.apache.flink.api.java.tuple.Tuple4;
+import org.apache.flink.api.java.tuple.Tuple5;
 import org.apache.flink.configuration.Configuration;
-import org.apache.flink.core.fs.FileSystem;
 import org.apache.flink.util.Collector;
 
 import java.io.BufferedWriter;
@@ -17,44 +22,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 
-public class TreeBuilder {
-    /*public static Split currentSplit = new Split();
+public class TreeBuilder1 {
 
-    public static List<Split> splitList = new ArrayList<>();
-
-    public static int currentIndex = 0;*/
 
     public static void main(String[] args) throws Exception {
         final ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
         long time = System.currentTimeMillis();
 
-        //Split currentSplit = new Split();
-        //List<Split> splitList = new ArrayList<>();
-//        int currentIndex = 0;
-
-        //splitList.add(currentSplit);
-        //int splitListSize = splitList.size();
-
-        //Split newSplit;
-
-        //while (splitListSize > currentIndex) {
-        //  currentSplit = splitList.get(currentIndex);
-        // DataSet<Integer> currentInd = env.from.....
-/*
-            DataSet<Tuple1<String>> reduceOutput = env.readTextFile(Config.pathToPlayTennis())
-                    .flatMap(new MapperOne())
-                    .groupBy(0)
-                    .reduceGroup(new ReducerOne())
-                    .sortPartition(0, Order.ASCENDING)
-                    .setParallelism(1);
-
-            DataSet<Tuple6<Integer, String, Double, Integer, String, Double>> currentNodeInformation =
-                     reduceOutput.reduceGroup(new GainRatio());
-            currentNodeInformation.print();*/
-
         DataSet<Split> initial1 = env.fromElements(new Split());
         DataSet<Integer> initial2 = env.fromElements(0);
-        IterativeDataSet<Tuple4<Split, List, Integer, Boolean>> initial = initial1.cross(initial2).with(new CrossFunction<Split, Integer, Tuple4<Split, List, Integer, Boolean>>() {
+        DataSet<Tuple4<Split, List, Integer, Boolean>> initial = initial1.cross(initial2).with(new CrossFunction<Split, Integer, Tuple4<Split, List, Integer, Boolean>>() {
             @Override
             public Tuple4<Split, List, Integer, Boolean> cross(Split currentSplit, Integer currentindex) throws Exception {
                 List<Split> splitList = new ArrayList<>();
@@ -65,48 +42,26 @@ public class TreeBuilder {
         }).iterate(1000000);
         DataSet<String> input = env.readTextFile(Config.pathToPlayTennis());
 
-        IterativeDataSet <Tuple3<Integer, Integer,Boolean>> split = input
+        IterativeDataSet<Boolean> split = input
                 .flatMap(new MapperOne())
+                .withBroadcastSet(initial, "initial")
                 .groupBy(0)
                 .reduceGroup(new ReducerOne())
                 .sortPartition(0, Order.ASCENDING)
                 .setParallelism(1)
-                .reduceGroup(new GainRatio()).iterate(10);
-                /*.reduceGroup(new RichGroupReduceFunction<Tuple7<Integer, String, Double, Integer, String, Double,Split>, Tuple3<Integer, Integer,Boolean>>() {
-                    @Override
-                    public void reduce(Iterable<Tuple7<Integer, String, Double, Integer, String, Double,Split>> iterable, Collector<Tuple3<Integer, Integer,Boolean>> collector) throws Exception {
+                .reduceGroup(new GainRatio()).iterate(1000000);
 
-                        Tuple7<Integer, String, Double, Integer, String, Double,Split> tuple = iterable.iterator().next();
-                        StringTokenizer attributes = new StringTokenizer(tuple.f4);
-                        int splitNumber = attributes.countTokens(); //当前分裂节点属性值的个数
-                        Split currentSplit = tuple.f6;
-                        for (int i = 1; i <= splitNumber; i++) {
-                            Split newSplit = new Split();
-                            for (int j = 0; j < currentSplit.featureIndex.size(); j++) {
-                                newSplit.featureIndex.add(currentSplit.featureIndex.get(j));
-                                newSplit.featureValue.add(currentSplit.featureValue.get(j));
-                            }
-                            newSplit.featureIndex.add(tuple.f3);
-                            newSplit.featureValue.add(attributes.nextToken());
-                            //collector.collect(newSplit);
-                            //List splitList = new ArrayList();
-                            splitList.add(newSplit);
-                            collector.collect(new Tuple3<>(tuple.f0, splitList.size(),tuple.f0>splitList.size()));
-                        }
-                    }
-                }).iterate(1000000);
-       */
-        split.print();
+        DataSource<Boolean> close = env.fromElements(false);
+        split.closeWith(close);
+        System.out.println("Tree has been built!" + time + " " + System.currentTimeMillis());
     }
-    // System.out.println("Tree has been built!" + time + " " + System.currentTimeMillis());
-
     public static class MapperOne extends RichFlatMapFunction<String, Tuple5<String, Integer,Split,List<Split>,Integer>> {
       private Split currentSplit = new Split();
 
      private List<Split> splitList = new ArrayList<>();
         private int currentIndex = 0;
 
-       /* @Override
+        @Override
         public void open(Configuration parameters) throws Exception {
             super.open(parameters);
             List<Tuple4<Split,List,Integer,Boolean>> delta = getRuntimeContext().getBroadcastVariable("initial");
@@ -115,22 +70,18 @@ public class TreeBuilder {
                 splitList.add(currentSplit);
                 currentIndex = tuple.f2;
             }
-        }*/
+        }
 
         @Override
         public void flatMap(String value, Collector<Tuple5<String, Integer,Split,List<Split>,Integer>> out) throws Exception
         {
-            //splitList.add(currentSplit);
-            //Split split = TreeBuilder.currentSplit;
-            //judge if index and value are match
+
             currentSplit = splitList.get(currentIndex);
             boolean flag = true;
             StringTokenizer strTokenizer = new StringTokenizer(value);
 
-            //amount of features, here is 7
             int featureCount = strTokenizer.countTokens() - 1;
 
-            //store features of each line
             String features[] = new String[featureCount];
 
             for (int i = 0; i < featureCount; i++) {
@@ -140,7 +91,6 @@ public class TreeBuilder {
             String classLabel = strTokenizer.nextToken();
 
             int sp_size = currentSplit.featureIndex.size();
-            //iteration according to index of each line
             for (int indexID = 0; indexID < sp_size; indexID++) {
                 int currentIndexID = (Integer) currentSplit.featureIndex.get(indexID);
                 String attValue = (String) currentSplit.featureValue.get(indexID);
@@ -153,7 +103,6 @@ public class TreeBuilder {
             if (flag) {
                 for (int l = 0; l < featureCount; l++) {
                     if (!currentSplit.featureIndex.contains(l)) {
-                        //indexID,value,class,1
                         out.collect(new Tuple5<>(l + " " + features[l] + " " + classLabel, 1,currentSplit,splitList,currentIndex));
                     }
                 }
@@ -186,7 +135,7 @@ public class TreeBuilder {
     }
 
 
-    public static class GainRatio implements GroupReduceFunction<Tuple4<String,Split,List<Split>,Integer>, Tuple3<Integer, Integer,Boolean>>{
+    public static class GainRatio implements GroupReduceFunction<Tuple4<String,Split,List<Split>,Integer>, Boolean>{
         final static int LINE_NUMBER = 10000;
         String[][] reduceResults = new String[LINE_NUMBER][4];
         int lineNumber = 0;
@@ -197,9 +146,7 @@ public class TreeBuilder {
             return majorityLabel;
         }
         @Override
-       /* public void reduce(Iterable<Tuple4<String,Split,List<Split>,Integer>> iterable, Collector<Tuple9<Integer, String, Double, Integer, String, Double,Split,List<Split>,Integer>> collector) throws Exception {
-            double entropy;*/
-        public void reduce(Iterable<Tuple4<String,Split,List<Split>,Integer>> iterable, Collector<Tuple3<Integer, Integer, Boolean>> collector) throws Exception {
+        public void reduce(Iterable<Tuple4<String,Split,List<Split>,Integer>> iterable, Collector<Boolean> collector) throws Exception {
             double entropy;
             String classLabel;
             int labelMark[] = new int[LINE_NUMBER];
@@ -300,7 +247,7 @@ public class TreeBuilder {
 
 
 
-           collector.collect(new Tuple3<>(currentTuple.f3, currentTuple.f2.size(),b));
+           collector.collect(b);
 
         }
 
@@ -351,7 +298,7 @@ public class TreeBuilder {
             int i=0;
             int sumAll=0;
             while(sum[i]!=0) {
-                sumAll += sum[i]; //calculating total instance in node// 计算每一个属性究竟有多少个instance
+                sumAll += sum[i];
                 i++;
             }
             double pEntropySum=0;
@@ -370,10 +317,9 @@ public class TreeBuilder {
             String temp="";
             for(int z=0;z<LINE_NUMBER;z++){
                 if(reduceResults[z][0]!=null){
-                    if(n==Integer.parseInt(reduceResults[z][0])){   //如果n等于第z行reduce 输出的属性索引
+                    if(n==Integer.parseInt(reduceResults[z][0])){
                         flag=1;
                         if(!reduceResults[z][1].contentEquals(temp)) {
-                            //取出reduce第z行描述的属性的属性值
                             values=values+" "+ reduceResults[z][1];
                             temp= reduceResults[z][1];
                         }
@@ -391,7 +337,7 @@ public class TreeBuilder {
 
     public static void writeRuleToFile(String rule) {
         try {
-            BufferedWriter bw = new BufferedWriter(new FileWriter(new File("home/yezi/rule.txt"), true));
+            BufferedWriter bw = new BufferedWriter(new FileWriter(new File(Config.pathToInputSet()), true));
             bw.write(rule);
             bw.newLine();
             bw.close();
