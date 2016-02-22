@@ -169,8 +169,8 @@ public class TreeBuilder1 {
             reduceResults[lineNumber][2] = null;
             reduceResults[lineNumber][3] = null;
 
-            int currentIndex = Integer.parseInt(reduceResults[0][0]);//当前属性的index
-            while (currentIndex == Integer.parseInt(reduceResults[j][0])) {    // 当前索引值为reduce中输出的j行的索引值
+            int currentIndex = Integer.parseInt(reduceResults[0][0]);
+            while (currentIndex == Integer.parseInt(reduceResults[j][0])) {    
                 if (labelMark[j] == 0) {
                     classLabel = reduceResults[j][2];
                     tempIndex++;
@@ -200,11 +200,10 @@ public class TreeBuilder1 {
 
             entropy = entropy(currentNode);
             classLabel = this.majorityLabel();
-            //collector.collect(new Tuple6<>(currentIndex, classLabel, entropy, attributeIndex, "",0.0));
             if (entropy != 0.0 && currentSplit.featureIndex.size() != AttributeNumber) {
                 bestGainRatio = 0;
                 for (int i = 0; i < AttributeNumber; i++) {
-                    if (!currentSplit.featureIndex.contains(i)) { //表示这个属性在当前节点下属还木有被分裂过
+                    if (!currentSplit.featureIndex.contains(i)) { 
                         gainRatio = gainRatioCalculator(i, entropy);
                         if (gainRatio >= bestGainRatio) {
                             attributeIndex = i;
@@ -214,8 +213,7 @@ public class TreeBuilder1 {
                 }
                 String attributeValue = getAttributeValues(attributeIndex);
                 StringTokenizer attributes = new StringTokenizer(attributeValue);
-                int splitNumber = attributes.countTokens(); //当前分裂节点属性值的个数
-                //Split currentSplit = tuple.f6;
+                int splitNumber = attributes.countTokens(); 
                 for (int i = 1; i <= splitNumber; i++) {
                     Split newSplit = new Split();
                     for (int l = 0; l < currentSplit.featureIndex.size(); l++) {
@@ -226,10 +224,7 @@ public class TreeBuilder1 {
                     newSplit.featureValue.add(attributes.nextToken());
 
                    currentTuple.f2.add(newSplit);
-                    //collector.collect(new Tuple3<>(tuple.f0, splitList.size(),tuple.f0>splitList.size()));
                 }
-                //collector.collect(new Tuple9<>(currentIndex, classLabel, entropy, attributeIndex, attributeValue,bestGainRatio,currentSplit,currentTuple.f2,currentTuple.f3));
-
             }else{
                 String rule = "";
                 for (int i = 0; i < currentSplit.featureIndex.size(); i++) {
@@ -241,10 +236,7 @@ public class TreeBuilder1 {
 
             currentTuple.f3 ++;
             boolean b = currentTuple.f3 > currentTuple.f2.size();
-
-
-
-           collector.collect(b);
+            collector.collect(b);
 
         }
 
@@ -346,6 +338,4 @@ public class TreeBuilder1 {
         } catch (Exception e) {
         }
     }
-
-
 }
