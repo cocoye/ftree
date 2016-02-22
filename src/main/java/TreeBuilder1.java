@@ -1,4 +1,5 @@
-/** the algorithm idea implemented totally in Flink Dataflow way but unfortunately has something wrong with it.
+/** the algorithm idea implemented totally in Flink Dataflow way
+ *  but unfortunately has something wrong with it.
 */
 
 import org.apache.flink.api.common.functions.CrossFunction;
@@ -40,7 +41,7 @@ public class TreeBuilder1 {
                 return new Tuple4<Split, List, Integer, Boolean>(currentSplit, splitList, currentindex, b);
             }
         }).iterate(1000000);
-        DataSet<String> input = env.readTextFile(Config.pathToPlayTennis());
+        DataSet<String> input = env.readTextFile(Config.pathToInput());
 
         IterativeDataSet<Boolean> split = input
                 .flatMap(new MapperOne())
@@ -272,42 +273,47 @@ public class TreeBuilder1 {
         double gainRatioCalculator(int index, double entropy)
         {
             //100 is considered as max ClassLabels
-            int s[][]=new int[1000][100];
-            int sum[]=new int[1000]; //
-            String currentAttributeValue="";
+            int s[][] = new int[LINE_NUMBER][100];
+            int sum[] = new int[LINE_NUMBER]; //
+            String currentAttributeValue = "";
             double gainRatio;
-            int j=0;
-            int m=-1;                                         //m为分裂的索引,即同一属性属性值的个数
-            int lines= lineNumber;                             //reduce 共有多少行
+            int j = 0;
+            /*amount of feature' values with the same feature*/
+            int m = -1;
+            int lines = lineNumber;
 
-            for(int i=0;i<lines;i++){                        //遍历每一行reduce
-                if(index ==Integer.parseInt(reduceResults[i][0])) {                //如果当前属性索引恰好为reduce某一行索引
-                    if(reduceResults[i][1].contentEquals(currentAttributeValue)) {  //如果当前属性值恰好为reduce相应行的属性值
+            for (int i = 0; i < lines; i++) {
+            /*current featureIndex is featureIndex of reduceOutput in this column*/
+                if (index == Integer.parseInt(reduceResults[i][0])) {
+                /*current featureValue is featureValue of reduceOutput in this column*/
+                    if (reduceResults[i][1].contentEquals(currentAttributeValue)) {
                         j++;
-                        s[m][j]=Integer.parseInt(reduceResults[i][3]);      //c[m][j]为当前属性索引属性值的相应类的个数
-                        sum[m]+=s[m][j];
+                        //c[m][j] is the amount of class of current value
+                        s[m][j] = Integer.parseInt(reduceResults[i][3]);
+                        sum[m] += s[m][j];
                     } else {
-                        j=0;
+                        j = 0;
                         m++;
-                        currentAttributeValue= reduceResults[i][1];
-                        s[m][j]=Integer.parseInt(reduceResults[i][3]);
-                        sum[m]=s[m][j];
+                        currentAttributeValue = reduceResults[i][1];
+                        s[m][j] = Integer.parseInt(reduceResults[i][3]);
+                        sum[m] = s[m][j];
                     }
                 }
             }
-            int i=0;
-            int sumAll=0;
-            while(sum[i]!=0) {
+            int i = 0;
+            int sumAll = 0;
+        /*calculate the amount of instances of each attribute*/
+            while (sum[i] != 0) {
                 sumAll += sum[i];
                 i++;
             }
-            double pEntropySum=0;
-            for(int k=0;k<=m;k++) {
-                double p = (double)sum[k]/sumAll;
+            double pEntropySum = 0;
+            for (int k = 0; k <= m; k++) {
+                double p = (double) sum[k] / sumAll;
                 pEntropySum += p * entropy(s[k]);
             }
-            double splitInfo= entropy(sum);
-            gainRatio=(entropy-pEntropySum)/(splitInfo);
+            double splitInfo = entropy(sum);
+            gainRatio = (entropy - pEntropySum) / (splitInfo);
             return gainRatio;
 
         }
@@ -337,7 +343,7 @@ public class TreeBuilder1 {
 
     public static void writeRuleToFile(String rule) {
         try {
-            BufferedWriter bw = new BufferedWriter(new FileWriter(new File(Config.pathToInputSet()), true));
+            BufferedWriter bw = new BufferedWriter(new FileWriter(new File(Config.pathToReduceOutput()), true));
             bw.write(rule);
             bw.newLine();
             bw.close();

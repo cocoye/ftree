@@ -12,16 +12,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-/**
- * Created by yezi on 2/4/16.
- */
 public class Classification {
-
     public static void main(String args[]) throws Exception {
-
         ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
-        DataSource<String> rules = env.readTextFile(Config.pathToRuleSet());
-        DataSource<String> testData = env.readTextFile(Config.pathToGeTestSet());
+        DataSource<String> rules = env.readTextFile(Config.pathToRule());
+        DataSource<String> testData = env.readTextFile(Config.pathToTestSet());
 
         DataSet<Tuple3<String,String,String>> results=testData.flatMap(new Classifier()).withBroadcastSet(rules, "rules");
         DataSet<String> accuracy = results.reduceGroup(new Evaluator());
@@ -50,7 +45,6 @@ public class Classification {
                 testData[i] = itr1.nextToken();
             }
 
-            //System.out.println(testData[no_Attr - 1]);
             String predictClassLabel = "";
             for (int i = 0; i < rule.size(); i++) {
                 StringTokenizer itr = new StringTokenizer(rule.get(i));
@@ -60,7 +54,6 @@ public class Classification {
                     rule[j] = itr.nextToken();
                 }
                 String ruleClassLabel = itr.nextToken();
-                // System.out.println(ruleClassLabel);
                 for (int k = 0; k < no_Rule; k += 2) {
                     if (!testData[Integer.parseInt(rule[k])].equals(rule[k + 1])) {
                         break;
@@ -68,9 +61,6 @@ public class Classification {
                     if (k != no_Rule - 2) {
                         continue;
                     }
-/*                    if(k == no_Rule -2 & testData[Integer.parseInt(rule[k])].equals(rule[no_Rule-1])) {
-                        predictClassLabel = ruleClassLabel;
-                    }*/
                     predictClassLabel = ruleClassLabel;
                 }
             }
