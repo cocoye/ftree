@@ -1,7 +1,3 @@
-/** the algorithm idea implemented totally in Flink Dataflow way
- *  but unfortunately has something wrong with it.
-*/
-
 import org.apache.flink.api.common.functions.CrossFunction;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
