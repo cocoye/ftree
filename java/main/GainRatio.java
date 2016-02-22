@@ -151,7 +151,6 @@ class GainRatio {
             if (reduceResults[z][0] != null) {
                 /*z is reduceoutput's line number,0 is featureIndex*/
                 if (n == Integer.parseInt(reduceResults[z][0])) {
-                    //如果n等于第z行reduce输出的属性索引
                     flag = 1;
                     if (!reduceResults[z][1].contentEquals(temp)) {
                         values = values + " " + reduceResults[z][1];
