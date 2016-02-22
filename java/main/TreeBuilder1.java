@@ -136,7 +136,7 @@ public class TreeBuilder1 {
         final static int LINE_NUMBER = 10000;
         String[][] reduceResults = new String[LINE_NUMBER][4];
         int lineNumber = 0;
-        int currentNode[] = new int[100];                    //或者最多分100类
+        int currentNode[] = new int[100];                  
         String majorityLabel = null;
 
         public String majorityLabel() {
